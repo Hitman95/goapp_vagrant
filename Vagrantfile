@@ -12,9 +12,13 @@ Vagrant.configure('2') do |config|
         override.nfs.functional = false
         provider.token = ENV['TOKEN']
         provider.image = 'ubuntu-16-04-x64'
-        provider.region = 'nyc1'
-        provider.size = '512mb'
+        provider.region = 'fra1'
+        provider.size = '1Gb'
       end
      config.vm.synced_folder ".", "/vagrant", disabled: true
+     config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "ansible/base_setup.yml"
+        ansible.playbook = "ansible/app.yml"
+     end
   end
 end

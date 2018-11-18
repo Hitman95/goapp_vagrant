@@ -1,0 +1,4 @@
+---
+- name: start goapp-api
+  service: name=goapp-api state=reloaded enabled=yes
+

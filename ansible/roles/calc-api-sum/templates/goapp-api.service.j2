@@ -1,0 +1,14 @@
+[Unit]
+Description=goapp-api
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+User=www-data
+ExecStart=/srv/goapp-api/main
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+

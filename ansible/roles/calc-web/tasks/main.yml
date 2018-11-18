@@ -1,0 +1,46 @@
+---
+- name: Install git
+  apt: name=git state=latest
+
+- name: Install Let’s Encrypt
+  apt: name=letsencrypt state=latest
+
+- name: Add folder to acme
+  file: path=/srv/acme state=directory
+
+- name: Clone goapp-web
+  git:
+   repo: https://github.com/Hitman95/goapp-web.git
+   dest: /srv/goapp-web
+   clone: yes
+
+- name: Install http site config
+  template: src=http.j2 dest=/etc/nginx/sites-available/http owner=root group=root mode=0644
+  notify: restart nginx
+
+- name: Create link http site
+  file: src=/etc/nginx/sites-available/http dest=/etc/nginx/sites-enabled/http state=link owner=root group=root mode=0644
+  notify: restart nginx
+
+- name: Force nginx restart
+  meta: flush_handlers
+
+- name: Recieve SSL sertificates
+  shell: letsencrypt certonly --non-interactive --agree-tos --webroot -w /srv/acme -d {{domain_name}} --email {{email}}
+  args:
+   creates: /etc/letsencrypt/live/{{domain_name}}/fullchain.pem
+
+- name: Add letsencrypt cronjob for cert renewal
+  cron:
+   name: letsencrypt_renewal
+   special_time: daily
+   job: letsencrypt --renew certonly -a webroot --webroot-path=/srv/acme && systemctl reload nginx
+
+- name: Install https site config
+  template: src=https.j2 dest=/etc/nginx/sites-available/{{domain_name}} owner=root group=root mode=0644
+  notify: restart nginx
+
+- name: Create link https site
+  file: src=/etc/nginx/sites-available/{{domain_name}} dest=/etc/nginx/sites-enabled/{{domain_name}} state=link owner=root group=root mode=0644
+  notify: restart nginx
+

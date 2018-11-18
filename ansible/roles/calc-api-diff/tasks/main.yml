@@ -1,0 +1,10 @@
+---
+- name: Install git
+  apt: name=git state=latest
+
+- name: Clone phpapp
+  git:
+   repo: https://github.com/Hitman95/phpapp.git
+   dest: /srv/phpapp
+   clone: yes
+

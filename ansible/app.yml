@@ -1,0 +1,10 @@
+---
+- hosts: all
+  roles:
+    - nginx
+    - php-fpm
+    - calc-web
+    - calc-api-diff
+    - calc-api-sum
+
+
