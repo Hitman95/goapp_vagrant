@@ -13,12 +13,17 @@ Vagrant.configure('2') do |config|
         provider.token = ENV['TOKEN']
         provider.image = 'ubuntu-16-04-x64'
         provider.region = 'fra1'
-        provider.size = '1Gb'
+        provider.size = '512mb'
       end
+
      config.vm.synced_folder ".", "/vagrant", disabled: true
+
+     config.vm.provision "shell",
+        inline: "apt update -y && apt install -y python2.7-minimal && update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1"
+
      config.vm.provision "ansible" do |ansible|
-        ansible.playbook = "ansible/base_setup.yml"
         ansible.playbook = "ansible/app.yml"
      end
+
   end
 end

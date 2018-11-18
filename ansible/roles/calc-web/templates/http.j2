@@ -1,14 +1,23 @@
 server {
         listen 80;
 
-        server_name {{domain_name}};
-
-        location /.well-known/ {
-         root /srv/acme;
+        location / {
+         root /srv/goapp-web;
         }
 
-        location / {
-         return 301 https://{{domain_name}}$request_uri;
+        location ~ /\.ht|.git {
+         deny all;
+        }
+
+        location /api/sum {
+         rewrite ^/api/(.*)$ /$1 break;
+         proxy_pass http://localhost:8080;
+        }
+
+        location /api/diff {
+         include fastcgi_params;
+         fastcgi_param SCRIPT_FILENAME /srv/phpapp/diff.php;
+         fastcgi_pass unix://var/run/php/php7.0-fpm.sock;
         }
 }
 
